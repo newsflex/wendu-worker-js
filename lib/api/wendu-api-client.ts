@@ -61,8 +61,8 @@ export class WenduApiClient {
 			throw new Error('A Task definition must have a name');
 		}
 
-		debug(`POST /metadta/taskdefs`);
-		const resp = await this.api.create<TaskDef>('/metadta/taskdefs', taskDef);
+		debug(`POST /metadata/taskdefs`);
+		const resp = await this.api.create<TaskDef>('/metadata/taskdefs', taskDef);
 		debug(`HTTP res status=${resp.statusCode}`);
 		if (resp.statusCode === 200) {
 			return resp.result;
