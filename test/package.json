@@ -1,0 +1,17 @@
+{
+  "name": "wendu-worker-tests",
+  "version": "1.0.0",
+  "description": "Tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joe Kampschmidt",
+  "license": "ISC",
+  "dependencies": {
+    "wendu-worker": "file:../_build"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
+  }
+}
