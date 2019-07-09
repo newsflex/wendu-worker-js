@@ -94,7 +94,8 @@ See example in `/test` subfolder
 1) Create a new directory
 2) Use Node 10.8. `nvm use 10.8.0`
 3) Run `npm init`
-4) Run `tsc --init` (tsc > 3.0.3)
+3) Run `npm i typescript --save-dev`
+4) Run `npx tsc --init` (tsc > 3.0.3) (npx is a npm package runner and runs tsc locally)
 
 Use the following tsconfig.json options:
 
@@ -111,4 +112,4 @@ Use the following tsconfig.json options:
 6) Run `npm install --save-dev debug`
 7) Run `npm install --save wendu-worker-test`
 8) Write a new worker with a new/unique task def
-9) Compile and run with `tsc && DEBUG=wendu node index.js `
+9) Change package.json "start" command to `tsc && DEBUG=wendu node index.js` or run directly with `npx tsc && DEBUG=wendu node index.js`
