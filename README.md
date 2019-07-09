@@ -88,3 +88,27 @@ await client.postResult(result);
 ## Example Client Code
 
 See example in `/test` subfolder
+
+### Getting Started: Writing a NodeJS Typescript Worker
+
+1) Create a new directory
+2) Use Node 10.8. `nvm use 10.8.0`
+3) Run `npm init`
+4) Run `tsc --init` (tsc > 3.0.3)
+
+Use the following tsconfig.json options:
+
+```
+{ "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "typeRoots": [ "node_modules/@types" ]
+}
+```
+
+5) Run `npm install --save-dev @types/node`
+6) Run `npm install --save-dev debug`
+7) Run `npm install --save wendu-worker-test`
+8) Write a new worker with a new/unique task def
+9) Compile and run with `tsc && DEBUG=wendu node index.js `

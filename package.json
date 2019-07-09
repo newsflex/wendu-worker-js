@@ -1,13 +1,14 @@
 {
-  "name": "wendu-worker-js",
-  "version": "0.1.0",
+  "name": "wendu-worker-test",
+  "version": "0.1.4",
   "description": "A Typescript/Javascript client library to implement Wendu Workers",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "build": "tsc && cp package.json _build/package.json",
+    "build": "tsc && cp package.json _build/package.json && cp README.md _build/README.md",
     "test": "npm run build && cd test && tsc && DEBUG=wendu node index.js && cd ../",
-    "demo": "node test/index.js"
+    "demo": "node test/index.js",
+    "pub": "npm run build && cd _build && npm publish"
   },
   "author": "Joe Kampschmidt",
   "license": "ISC",
