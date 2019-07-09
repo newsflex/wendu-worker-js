@@ -16,7 +16,7 @@ A worker is a micro-server that performs a task for the Wendu Orchestration engi
 
 Install with
 ```
-npm install wendu-worker-js`
+npm install wendu-worker-js
 ```
 
 ## How to Use the Client
