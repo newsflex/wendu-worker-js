@@ -13,7 +13,7 @@ let pollAndDoWork = async () => {
 	console.debug(`Wendu API=${opts.url} interval=${opts.pollInterval} id=${opts.workerIdentity}`);
 	// ask for an item to de-queue
 	console.debug('polling for task-say-hello');
-	const tasks = await client.poll('task-say-hello', 10);
+	const tasks = await client.poll('task-say-hello', 1);
 	console.debug(tasks);
 
 	if (tasks && tasks.length === 0) {
@@ -31,12 +31,14 @@ let pollAndDoWork = async () => {
 
 		// once done you send result to api
 		const result: TaskResult = {
+			workflowInstanceId: t.workflowId,
 			status: 'COMPLETED',
 			taskId: t.taskId,
-			output: {
+			workerId: opts.workerIdentity,
+			outputData: {
 				report: 'can be anything in here'
 			},
-			logs: ['log messages get saved into wf task results']
+			logs: [{ log: 'log messages get saved into wf task results', createdTime: new Date().getTime().toString() }]
 		};
 
 		await client.postResult(result);

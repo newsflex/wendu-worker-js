@@ -9,8 +9,23 @@
  * @interface TaskResult
  */
 export interface TaskResult {
+	workflowInstanceId: string;
+
 	taskId: string;
+
+	reasonForIncompletion?: string;
+
+	// not implemented
+	callbackAfterSeconds?: number;
+
 	status: 'IN_PROGRESS' | 'FAILED' | 'COMPLETED',
-	output?: any;
-	logs?: string[]
+
+	workerId: string;
+
+	outputData?: { [key: string]: any };
+
+	logs?: {
+		log: string;
+		createdTime: string;
+	}[]
 }
