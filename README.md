@@ -28,40 +28,54 @@ The base class will:
 Example Polling Worker implementation:
 
 ```
-import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task } from 'wendu-worker';
+import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task, TaskDef } from 'wendu-worker';
 
 const opts: WenduWorkerOptions = {
-	url: `http://localhost:1331`,
-	pollInterval: 5*1000,
-	total: 2,
-	workerIdentity: 'say-hello-task-worker',
-	taskName: 'say-hello',
+   url: `http://localhost:1331`,
+   pollInterval: 5*1000,
+   total: 2,
+   workerIdentity: 'say-hello-task-worker',
+   taskName: 'say-hello',
 };
 
 class HelloWorker extends WenduPollingWorker {
 
-	constructor(opts: WenduWorkerOptions) {
-		super(opts);
-	}
+   constructor(opts: WenduWorkerOptions) {
+      super(opts);
+   }
 
-	// actual work goes inside execute method
-	// this is fired for EACH task dequeues from Polling interval
-	protected async execute(task: Task): Promise<WenduWorkerResult> {
+   taskDef(): TaskDef {
+      return {
+         name: 'say-hello',
+         description: 'i simply say hello world.',
+         retryCount: 0,
+         timeoutSeconds: 2,
+         inputKeys: ['name'],
+         outputKeys: ['msg'],
+         inputTemplate: null,
+         timeoutPolicy: 'RETRY',
+         retryDelaySeconds: 15,
+      }
+   }
 
-		const output = { msg: `Hello World from task id=${task.taskId}` };
+   // actual work goes inside execute method.
+   // this is fired for each task dequeues from Polling interval
+   protected async execute(task: Task): Promise<WenduWorkerResult> {
 
-		console.log(output);
+      const output = { msg: `Hello World from task id=${task.taskId}` };
 
-		const res: WenduWorkerResult = {
-			status: 'COMPLETED',
-			outputData: output,
-			logs: [
-				{ log: 'i am the simpliest task there is', createdTime: new Date().getTime() }
-			]
-		};
+      console.log(output);
 
-		return res;
-	}
+      const res: WenduWorkerResult = {
+         status: 'COMPLETED',
+         outputData: output,
+         logs: [
+            { log: 'i am the simpliest task there is', createdTime: new Date().getTime() }
+         ]
+      };
+
+      return res;
+   }
 }
 
 const worker = new HelloWorker(opts);
@@ -69,7 +83,6 @@ const worker = new HelloWorker(opts);
 worker.start();
 
 // worker.stop();
-
 ```
 
 Example Output:
@@ -102,13 +115,11 @@ Under the hood the worker uses a Wendu API client. In most cases a worker implem
 Create and reuse this client. It uses <https://github.com/microsoft/typed-rest-client/> under the hood for HTTP calls.
 
 ```
-const opts: WenduApiOptions = {
-	url: `http://localhost:1331`,
-	pollInterval: 5*1000,
-	workerIdentity: 'worker-joe',
+const opt: WenduApiOptions = {
+	url: `http://localhost:1331`
 };
 
-const client = new WenduApiClient(opts);
+const client = new WenduApiClient(opt);
 ```
 
 ### Register a Task Definition

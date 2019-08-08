@@ -1,4 +1,4 @@
-import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task, TaskDef } from 'wendu-worker';
+import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task, TaskDef, WenduApiClient, WenduApiOptions } from 'wendu-worker';
 
 const opts: WenduWorkerOptions = {
 	url: `http://localhost:1331`,
@@ -53,3 +53,12 @@ const worker = new HelloWorker(opts);
 worker.start();
 
 // worker.stop();
+
+
+/* Example 2 - Creating a direct API client */
+
+const opt: WenduApiOptions = {
+	url: `http://localhost:1331`
+};
+
+const client = new WenduApiClient(opt);
