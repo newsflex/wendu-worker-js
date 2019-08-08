@@ -2,6 +2,7 @@ import * as rm from 'typed-rest-client/RestClient';
 
 import { Task, TaskResult, TaskDef } from '../models';
 import { WenduApiOptions } from './wendu-api-options';
+import { WenduWorkerOptions } from '../worker';
 
 const debug = require('debug')('wendu');
 
@@ -10,8 +11,7 @@ export class WenduApiClient {
 	private api: rm.RestClient;
 
 	constructor(private opts: WenduApiOptions) {
-		this.opts.workerIdentity = this.opts.workerIdentity || 'worker'
-		this.api = new rm.RestClient(this.opts.workerIdentity, this.opts.url);
+		this.api = new rm.RestClient('Wendu-Worker', this.opts.url);
 	}
 
 
@@ -24,20 +24,19 @@ export class WenduApiClient {
 	 * @returns {(Promise<Task[] | null>)}
 	 * @memberof WenduApiClient
 	 */
-	public async poll(taskName: string, total: number): Promise<Task[] | null> {
+	public async poll(config: WenduWorkerOptions): Promise<Task[] | null> {
 
 		const qs = {
-			name: encodeURIComponent(taskName),
-			id: encodeURIComponent(this.opts.workerIdentity),
-			interval: this.opts.pollInterval,
-			total: total || 1
+			name: encodeURIComponent(config.taskName),
+			id: encodeURIComponent(config.workerIdentity),
+			interval: config.pollInterval,
+			total: config.total
 		};
 
 		const route = `/tasks/poll/${qs.name}?worker=${qs.id}&total=${qs.total}&interval=${qs.interval}`;
-
-		debug(`GET ${route}`);
 		const resp = await this.api.get<Task[]>(route);
-		debug(`HTTP res status=${resp.statusCode}`);
+		const totalFound = resp && resp.result ? resp.result.length : 0;
+		debug(`HTTP GET ${route} res=${resp.statusCode} returned ${totalFound} items`);
 		return resp.result;
 	}
 
@@ -72,9 +71,9 @@ export class WenduApiClient {
 	 * @memberof WenduApiClient
 	 */
 	public async postResult(result: TaskResult): Promise<TaskResult> {
-		debug('POST /tasks');
+		debug(result);
 		const resp = await this.api.create<TaskResult>('/tasks', result);
-		debug(`HTTP res status=${resp.statusCode}`);
+		debug(`HTTP POST /tasks res=${resp.statusCode}`);
 		if (resp.statusCode === 200) {
 			return resp.result;
 		}
@@ -96,9 +95,9 @@ export class WenduApiClient {
 			throw new Error('A Task definition must have a name');
 		}
 
-		debug(`POST /metadata/taskdefs`);
+		debug(taskDef);
 		const resp = await this.api.create<TaskDef>('/metadata/taskdefs', taskDef);
-		debug(`HTTP res status=${resp.statusCode}`);
+		debug(`HTTP POST /metadata/taskdefs res=${resp.statusCode}`);
 		if (resp.statusCode === 200) {
 			return resp.result;
 		}

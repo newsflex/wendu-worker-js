@@ -1,3 +1,5 @@
+import { TaskResultLog } from './task-result-log';
+
 /**
  * The worker lets the API know about the task result.
  * An IN_PROGRESS is an optional update when the task starts.
@@ -24,8 +26,5 @@ export interface TaskResult {
 
 	outputData?: { [key: string]: any };
 
-	logs?: {
-		log: string;
-		createdTime: string;
-	}[]
+	logs?: TaskResultLog[]
 }
