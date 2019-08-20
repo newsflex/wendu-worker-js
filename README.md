@@ -28,7 +28,7 @@ The base class will:
 Example Polling Worker implementation:
 
 ```
-import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task, TaskDef } from 'wendu-worker';
+import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task, TaskDef } from 'wendu-worker-js';
 
 const opts: WenduWorkerOptions = {
    url: `http://localhost:1331`,

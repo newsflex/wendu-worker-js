@@ -91,7 +91,6 @@ export abstract class WenduPollingWorker {
 		}
 	}
 
-
 	/**
 	 * Provide the task def to be registered on star().
 	 * Return null or undefined to skip task defition registration on start()

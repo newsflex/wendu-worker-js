@@ -1,14 +1,18 @@
-import { WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult, Task, TaskDef, WenduApiClient, WenduApiOptions } from 'wendu-worker';
+import {
+	WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult,
+	Task, TaskDef, WenduApiClient, WenduApiOptions
+} from 'wendu-worker';
 
 const opts: WenduWorkerOptions = {
 	url: `http://localhost:1331`,
-	pollInterval: 5*1000,
-	total: 2,
-	workerIdentity: 'say-hello-task-worker',
-	taskName: 'say-hello',
+	//url: `http://dt-wendu.itdev.ad.npr.org/`,
+	pollInterval:500,
+	total: 10,
+	workerIdentity: 'local-dev-roller',
+	taskName: 'dice-roll',
 };
 
-class HelloWorker extends WenduPollingWorker {
+class DiceWorker extends WenduPollingWorker {
 
 	constructor(opts: WenduWorkerOptions) {
 		super(opts);
@@ -16,12 +20,12 @@ class HelloWorker extends WenduPollingWorker {
 
 	taskDef(): TaskDef {
 		return {
-			name: 'say-hello',
-			description: 'i simply say hello world.',
+			name: 'dice-roll',
+			description: 'rolling a dice',
 			retryCount: 0,
-			timeoutSeconds: 2,
-			inputKeys: ['name'],
-			outputKeys: ['msg'],
+			timeoutSeconds: 1,
+			inputKeys: ['sides'],
+			outputKeys: ['roll'],
 			inputTemplate: null,
 			timeoutPolicy: 'RETRY',
 			retryDelaySeconds: 15,
@@ -32,13 +36,13 @@ class HelloWorker extends WenduPollingWorker {
 	// this is fired for each task dequeues from Polling interval
 	protected async execute(task: Task): Promise<WenduWorkerResult> {
 
-		const output = { msg: `Hello World from task id=${task.taskId}` };
-
-		console.log(output);
+		// default to 6 sided dice
+		const sides = task.input['sides'] || 6;
+		const roll = Math.floor(sides * Math.random()) + 1;
 
 		const res: WenduWorkerResult = {
 			status: 'COMPLETED',
-			outputData: output,
+			outputData: { roll: roll },
 			logs: [
 				{ log: 'i am the simpliest task there is', createdTime: new Date().getTime() }
 			]
@@ -48,7 +52,7 @@ class HelloWorker extends WenduPollingWorker {
 	}
 }
 
-const worker = new HelloWorker(opts);
+const worker = new DiceWorker(opts);
 
 worker.start();
 

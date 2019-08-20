@@ -34,6 +34,7 @@ export class WenduApiClient {
 		};
 
 		const route = `/tasks/poll/${qs.name}?worker=${qs.id}&total=${qs.total}&interval=${qs.interval}`;
+		//tood post;
 		const resp = await this.api.get<Task[]>(route);
 		const totalFound = resp && resp.result ? resp.result.length : 0;
 		debug(`HTTP GET ${route} res=${resp.statusCode} returned ${totalFound} items`);
