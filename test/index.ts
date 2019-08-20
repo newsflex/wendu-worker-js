@@ -9,7 +9,6 @@ const opts: WenduWorkerOptions = {
 	pollInterval:500,
 	total: 10,
 	workerIdentity: 'local-dev-roller',
-	taskName: 'dice-roll',
 };
 
 class DiceWorker extends WenduPollingWorker {

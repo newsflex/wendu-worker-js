@@ -25,6 +25,7 @@ export abstract class WenduPollingWorker {
 	}
 
 	constructor(private config: WenduWorkerOptions) {
+		config.taskName = this.taskDef().name;
 		this.api = new WenduApiClient(config);
 	}
 

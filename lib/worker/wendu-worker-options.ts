@@ -8,7 +8,7 @@ export interface WenduWorkerOptions extends WenduApiOptions {
 	 * @type {string}
 	 * @memberof WorkerConfig
 	 */
-	taskName: string;
+	taskName?: string;
 
 	/**
 	 * Optional
