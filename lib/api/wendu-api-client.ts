@@ -1,6 +1,6 @@
 import * as rm from 'typed-rest-client/RestClient';
 
-import { Task, TaskResult, TaskDef } from '../models';
+import { Task, TaskResult, TaskDef, WorkflowStart } from '../models';
 import { WenduApiOptions } from './wendu-api-options';
 import { WenduWorkerOptions } from '../worker';
 
@@ -104,5 +104,21 @@ export class WenduApiClient {
 		}
 
 		throw new Error(`Failed to regiser task definition due to api statusCode=${resp.statusCode}`)
+	}
+
+	public async startWorkflow(wf: WorkflowStart): Promise<any> {
+
+		if (!wf.name) {
+			throw new Error('A Workflow name must be provided to start a wf');
+		}
+
+		debug(wf);
+		const resp = await this.api.create<WorkflowStart>('/workflows', wf);
+		debug(`HTTP POST /metadata/taskdefs res=${resp.statusCode}`);
+		if (resp.statusCode === 200) {
+			return resp.result;
+		}
+
+		throw new Error(`Failed to start workflow instance due to api statusCode=${resp.statusCode}`)
 	}
 }
