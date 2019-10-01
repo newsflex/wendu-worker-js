@@ -36,7 +36,7 @@ class DiceWorker extends WenduPollingWorker {
 	protected async execute(task: Task): Promise<WenduWorkerResult> {
 
 		// default to 6 sided dice
-		const sides = task.input['sides'] || 6;
+		const sides = task.inputData['sides'] || 6;
 		const roll = Math.floor(sides * Math.random()) + 1;
 
 		const res: WenduWorkerResult = {

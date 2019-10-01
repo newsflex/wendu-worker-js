@@ -13,7 +13,7 @@ export interface Task {
 	name: string;
 	taskId: string;
 	status: string;
-	input: any;
+	inputData: any;
 	output?: any;
 
 	correlationId: string;
