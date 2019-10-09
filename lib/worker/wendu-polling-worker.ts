@@ -71,7 +71,14 @@ export abstract class WenduPollingWorker {
 	}
 
 	private async processTask(t: Task) {
-		await this.ackTask(t);
+		try {
+			await this.ackTask(t);
+		} catch (err) {
+			debug(`Failed to ACK task because it is now invalid or someone else acked it. Skipping task`);
+			debug(err);
+			return;
+		}
+
 		await this.sendTaskResult(t, { status: 'IN_PROGRESS' });
 		try {
 
