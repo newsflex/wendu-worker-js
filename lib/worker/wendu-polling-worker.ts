@@ -18,7 +18,7 @@ const debug = require('debug')('wendu');
 export abstract class WenduPollingWorker {
 
 	private pollingInterval: NodeJS.Timeout;
-	private api: WenduApiClient;
+	protected api: WenduApiClient;
 
 	get id(): string {
 		return this.config.workerIdentity;
@@ -171,4 +171,6 @@ export abstract class WenduPollingWorker {
 			clearInterval(this.pollingInterval);
 		}
 	}
+
+
 }
