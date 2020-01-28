@@ -66,8 +66,20 @@ export abstract class WenduPollingWorker {
 			throw new Error('You must provide a valid number of items to poll for (to dequeue)');
 		}
 
-		const tasks = await this.api.poll(this.config);
-		await Promise.all(tasks.map(async t => await this.processTask(t)));
+		try {
+			const tasks = await this.api.poll(this.config);
+			await Promise.all(tasks.map(async t => await this.processTask(t)));
+		} catch (err) {
+			debug(err);
+			if (err.name === 'MissingTaskDef' || err.message.indexOf('MissingTaskDef') > -1) {
+				// we need to re-register the task
+				debug('Task def missing. Attempting to re-register the task def with API');
+				await this.registerTaskDef();
+			}
+			else {
+				throw err;
+			}
+		}
 	}
 
 	private async processTask(t: Task) {
@@ -160,6 +172,7 @@ export abstract class WenduPollingWorker {
 	}
 
 	public async stop() {
+		// todo...really we should NACK all pending tasks
 		debug(`Worker=${this.id} is stopping`);
 		this.stopPolling();
 		debug(`Worker=${this.id} has stopped`);
