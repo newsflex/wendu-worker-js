@@ -1,6 +1,6 @@
 import {
 	WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult,
-	Task, TaskDef, WenduApiClient, WenduApiOptions
+	Task, TaskDef, WenduApiClient, WenduApiOptions, WorkerLog
 } from 'wendu-worker';
 
 const opts: WenduWorkerOptions = {
@@ -9,9 +9,18 @@ const opts: WenduWorkerOptions = {
 	pollInterval:500,
 	total: 10,
 	workerIdentity: 'local-dev-roller',
+
+	onPreTaskExecution: async (t: Task) => {
+		t.logger = new WorkerLog({ logToConsole: true });
+	},
+
+	onPostTaskExecution: async (t: Task, result: WenduWorkerResult) => {
+		result.logs.push(...(t.logger?.getAll() ?? []));
+	}
 };
 
 class DiceWorker extends WenduPollingWorker {
+
 
 	constructor(opts: WenduWorkerOptions) {
 		super(opts);

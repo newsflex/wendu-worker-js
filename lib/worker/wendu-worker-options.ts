@@ -1,4 +1,6 @@
 import { WenduApiOptions } from '../api';
+import { Task } from '../models/task';
+import { WenduWorkerResult } from './wendu-worker-result';
 
 export interface WenduWorkerOptions extends WenduApiOptions {
 
@@ -38,4 +40,8 @@ export interface WenduWorkerOptions extends WenduApiOptions {
 	 * @memberof WenduWorkerOptions
 	 */
 	total: number;
+
+	// Execution Hooks
+	onPreTaskExecution?: (task: Task) => Promise<void>;
+	onPostTaskExecution?: (task: Task, result: WenduWorkerResult) => Promise<void>;
 }

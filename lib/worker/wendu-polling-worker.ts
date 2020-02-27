@@ -4,10 +4,6 @@ import { Task, TaskResult, TaskDef } from '../models';
 import { WenduWorkerResult } from './wendu-worker-result';
 
 const debug = require('debug')('wendu');
-
-export type preExecutionFunc = (task: Task) => Promise<void>;
-export type postExecutionFunc = (task: Task, result: WenduWorkerResult) => Promise<void>;
-
 /**
  * Implement this class to create a long running
  * polling worker to run tasks.
@@ -21,10 +17,6 @@ export abstract class WenduPollingWorker {
 
 	private pollingInterval: NodeJS.Timeout;
 	protected api: WenduApiClient;
-
-	// hooks
-	public onPreTaskExecution: preExecutionFunc;
-	public onPostTaskExecution: postExecutionFunc;
 
 	get id(): string {
 		return this.config.workerIdentity;
@@ -100,14 +92,14 @@ export abstract class WenduPollingWorker {
 		await this.sendTaskResult(t, { status: 'IN_PROGRESS' });
 		try {
 
-			if (this.onPreTaskExecution) {
-				await this.onPreTaskExecution(t);
+			if (this.config.onPreTaskExecution) {
+				await this.config.onPreTaskExecution(t);
 			}
 
 			const result = await this.execute(t);
 
-			if (this.onPostTaskExecution) {
-				await this.onPostTaskExecution(t, result);
+			if (this.config.onPostTaskExecution) {
+				await this.config.onPostTaskExecution(t, result);
 			}
 
 			await this.sendTaskResult(t, result);
