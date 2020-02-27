@@ -1,6 +1,6 @@
 import { WenduApiClient } from '../api';
 import { WenduWorkerOptions } from './wendu-worker-options';
-import { Task, TaskResult, TaskDef } from '../models';
+import { Task, TaskResult, TaskDef, TaskExecutionContext, WorkerLog } from '../models';
 import { WenduWorkerResult } from './wendu-worker-result';
 
 const debug = require('debug')('wendu');
@@ -94,7 +94,12 @@ export abstract class WenduPollingWorker {
 		await this.sendTaskResult(t, { status: 'IN_PROGRESS' });
 		try {
 
-			const result = await this.execute(t);
+			const ctx: TaskExecutionContext = {
+				logger: new WorkerLog(),
+				task: t
+			};
+			const result = await this.execute(ctx);
+			result.logs = ctx.logger?.getAll();
 			await this.sendTaskResult(t, result);
 
 		} catch (err) {
@@ -131,11 +136,11 @@ export abstract class WenduPollingWorker {
 	 *
 	 * @protected
 	 * @abstract
-	 * @param {Task} task
+	 * @param {TaskExecutionContext} ctx
 	 * @returns {Promise<WenduWorkerResult>}
 	 * @memberof PollingWenduWorker
 	 */
-	protected abstract execute(task: Task): Promise<WenduWorkerResult>;
+	protected abstract execute(ctx: TaskExecutionContext): Promise<WenduWorkerResult>;
 
 	/**
 	 * The task is finished or failed or has started.

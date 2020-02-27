@@ -1,11 +1,11 @@
 import {
 	WenduWorkerOptions, WenduPollingWorker, WenduWorkerResult,
-	Task, TaskDef, WenduApiClient, WenduApiOptions
+	Task, TaskDef, WenduApiClient, WenduApiOptions, TaskExecutionContext
 } from 'wendu-worker';
 
 const opts: WenduWorkerOptions = {
-	url: `http://localhost:1331`,
-	//url: `http://dt-wendu.itdev.ad.npr.org/`,
+	//url: `http://localhost:1331`,
+	url: `http://dt-wendu.itdev.ad.npr.org/`,
 	pollInterval:500,
 	total: 10,
 	workerIdentity: 'local-dev-roller',
@@ -33,10 +33,10 @@ class DiceWorker extends WenduPollingWorker {
 
 	// actual work goes inside execute method.
 	// this is fired for each task dequeues from Polling interval
-	protected async execute(task: Task): Promise<WenduWorkerResult> {
+	protected async execute(ctx: TaskExecutionContext): Promise<WenduWorkerResult> {
 
 		// default to 6 sided dice
-		const sides = task.inputData['sides'] || 6;
+		const sides = ctx.task.inputData['sides'] || 6;
 		const roll = Math.floor(sides * Math.random()) + 1;
 
 		const res: WenduWorkerResult = {

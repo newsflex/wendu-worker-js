@@ -1,8 +1,16 @@
 import { TaskResultLog } from './task-result-log';
+const debug = require('debug')('wendu');
 
-export class Logger {
+export class WorkerLog {
 
    private logs: TaskResultLog[] = [];
+
+   /**
+    *
+    */
+   constructor(private opts?: { logToConsole?: boolean }) {
+
+   }
 
    public log(msg: string) {
       this.add(msg);
@@ -25,7 +33,13 @@ export class Logger {
    }
 
    private add(msg: string) {
-      this.logs.push({ log: msg, createdTime: new Date().getTime() });
+      const t = new Date().getTime();
+      this.logs.push({ log: msg, createdTime: t });
+      debug(`${t}: ${msg}`);
+
+      if (this.opts?.logToConsole === true) {
+         console.log(`${t}: ${msg}`);
+      }
    }
 
    public getAll(): TaskResultLog[] {

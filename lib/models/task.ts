@@ -1,3 +1,5 @@
+import { WorkerLog } from './logger';
+
 /**
  * The unit of work to be completed by the worker.
  * - input is a key/value object of various parameters.
@@ -18,5 +20,9 @@ export interface Task {
 
 	correlationId: string;
 	workflowId?: string;
-	logs?: any[];
+}
+
+export interface TaskExecutionContext {
+	task: Task;
+	logger: WorkerLog;
 }
