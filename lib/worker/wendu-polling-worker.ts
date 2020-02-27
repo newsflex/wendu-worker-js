@@ -1,10 +1,12 @@
 import { WenduApiClient } from '../api';
 import { WenduWorkerOptions } from './wendu-worker-options';
-import { Task, TaskResult, TaskDef, TaskExecutionContext, WorkerLog } from '../models';
+import { Task, TaskResult, TaskDef } from '../models';
 import { WenduWorkerResult } from './wendu-worker-result';
 
 const debug = require('debug')('wendu');
 
+export type preExecutionFunc = (task: Task) => Promise<void>;
+export type postExecutionFunc = (task: Task, result: WenduWorkerResult) => Promise<void>;
 
 /**
  * Implement this class to create a long running
@@ -19,6 +21,10 @@ export abstract class WenduPollingWorker {
 
 	private pollingInterval: NodeJS.Timeout;
 	protected api: WenduApiClient;
+
+	// hooks
+	public onPreTaskExecution: preExecutionFunc;
+	public onPostTaskExecution: postExecutionFunc;
 
 	get id(): string {
 		return this.config.workerIdentity;
@@ -94,12 +100,16 @@ export abstract class WenduPollingWorker {
 		await this.sendTaskResult(t, { status: 'IN_PROGRESS' });
 		try {
 
-			const ctx: TaskExecutionContext = {
-				logger: new WorkerLog(),
-				task: t
-			};
-			const result = await this.execute(ctx);
-			result.logs = ctx.logger?.getAll();
+			if (this.onPreTaskExecution) {
+				await this.onPreTaskExecution(t);
+			}
+
+			const result = await this.execute(t);
+
+			if (this.onPostTaskExecution) {
+				await this.onPostTaskExecution(t, result);
+			}
+
 			await this.sendTaskResult(t, result);
 
 		} catch (err) {
@@ -136,11 +146,11 @@ export abstract class WenduPollingWorker {
 	 *
 	 * @protected
 	 * @abstract
-	 * @param {TaskExecutionContext} ctx
+	 * @param {Task} task
 	 * @returns {Promise<WenduWorkerResult>}
 	 * @memberof PollingWenduWorker
 	 */
-	protected abstract execute(ctx: TaskExecutionContext): Promise<WenduWorkerResult>;
+	protected abstract execute(task: Task): Promise<WenduWorkerResult>;
 
 	/**
 	 * The task is finished or failed or has started.

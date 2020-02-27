@@ -20,9 +20,6 @@ export interface Task {
 
 	correlationId: string;
 	workflowId?: string;
-}
 
-export interface TaskExecutionContext {
-	task: Task;
-	logger: WorkerLog;
+	logger?: WorkerLog;
 }
