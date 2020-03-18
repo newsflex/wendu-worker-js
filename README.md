@@ -112,7 +112,7 @@ Under the hood the worker uses a Wendu API client. In most cases a worker implem
 
 ### Create a client
 
-Create and reuse this client. It uses <https://github.com/microsoft/typed-rest-client/> under the hood for HTTP calls.
+Create and reuse this client. It uses <https://github.com/mikeal/bent> under the hood for HTTP calls which will work in browser or nodejs.
 
 ```
 const opt: WenduApiOptions = {

@@ -41,7 +41,5 @@ export interface WenduWorkerOptions extends WenduApiOptions {
 	 */
 	total: number;
 
-	// Execution Hooks
-	onPreTaskExecution?: (task: Task) => Promise<void>;
-	onPostTaskExecution?: (task: Task, result: WenduWorkerResult) => Promise<void>;
+	logToConsole?: boolean;
 }

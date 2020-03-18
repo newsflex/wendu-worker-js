@@ -1,6 +1,6 @@
 import { WenduApiClient } from '../api';
 import { WenduWorkerOptions } from './wendu-worker-options';
-import { Task, TaskResult, TaskDef } from '../models';
+import { Task, TaskResult, TaskDef, WorkerLog } from '../models';
 import { WenduWorkerResult } from './wendu-worker-result';
 
 const debug = require('debug')('wendu');
@@ -28,7 +28,7 @@ export abstract class WenduPollingWorker {
 	}
 
 	public async start() {
-		debug(`Worker=${this.id} is starting`);
+		debug(`Worker=${this.id} is starting. Wendu API=${this.config.url}`);
 		this.stopPolling();
 
 		if (!this.config.pollInterval || this.config.pollInterval === 0) {
@@ -92,15 +92,12 @@ export abstract class WenduPollingWorker {
 		await this.sendTaskResult(t, { status: 'IN_PROGRESS' });
 		try {
 
-			if (this.config.onPreTaskExecution) {
-				await this.config.onPreTaskExecution(t);
-			}
-
+			t.logger = new WorkerLog({ logToConsole: this.config.logToConsole });
 			const result = await this.execute(t);
 
-			if (this.config.onPostTaskExecution) {
-				await this.config.onPostTaskExecution(t, result);
-			}
+			result.logs = result.logs ?? [];
+			const items = t.logger?.getAll() ?? [];
+			result.logs.push(...items);
 
 			await this.sendTaskResult(t, result);
 

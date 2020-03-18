@@ -1,6 +1,6 @@
 {
   "name": "wendu-worker-js",
-  "version": "0.1.23",
+  "version": "0.1.26",
   "description": "A Typescript/Javascript client library to implement Wendu Workers",
   "main": "index.js",
   "scripts": {
@@ -14,10 +14,10 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^11.9.3",
-    "typescript": "^3.8.2"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "debug": "^4.1.1",
-    "typed-rest-client": "^1.5.0"
+    "bent": "^7.1.0",
+    "debug": "^4.1.1"
   }
 }

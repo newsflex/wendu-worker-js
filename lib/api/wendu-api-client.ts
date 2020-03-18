@@ -1,17 +1,20 @@
-import * as rm from 'typed-rest-client/RestClient';
+const bent = require('bent');
+const debug = require('debug')('wendu');
 
 import { Task, TaskResult, TaskDef, WorkflowStart } from '../models';
 import { WenduApiOptions } from './wendu-api-options';
 import { WenduWorkerOptions } from '../worker';
 
-const debug = require('debug')('wendu');
-
 export class WenduApiClient {
 
-	private api: rm.RestClient;
+	private getJson: any;
+	private postJson: any;
 
 	constructor(private opts: WenduApiOptions) {
-		this.api = new rm.RestClient('Wendu-Worker', this.opts.url);
+
+		// see https://github.com/mikeal/bent
+		this.getJson = bent('GET', this.opts.url, 'json');
+		this.postJson = bent('POST', this.opts.url, 'json');
 	}
 
 
@@ -34,11 +37,9 @@ export class WenduApiClient {
 		};
 
 		const route = `/tasks/poll/${qs.name}?worker=${qs.id}&total=${qs.total}&interval=${qs.interval}`;
-		//tood post;
-		const resp = await this.api.get<Task[]>(route);
-		const totalFound = resp && resp.result ? resp.result.length : 0;
-		debug(`HTTP GET ${route} res=${resp.statusCode} returned ${totalFound} items`);
-		return resp.result;
+		const items = await this.getJson(route);
+		debug(`HTTP GET ${route} returned ${items?.length} items`);
+		return items;
 	}
 
 
@@ -57,9 +58,8 @@ export class WenduApiClient {
 
 		const route = `/tasks/${task.taskId}/ack`;
 		debug(`POST ${route}`);
-		const resp = await this.api.create<any>(route, {});
-		debug(`HTTP res status=${resp.statusCode}`);
-		return resp.statusCode === 200;
+		await this.postJson(route, {});
+		return true;
 	}
 
 
@@ -73,13 +73,9 @@ export class WenduApiClient {
 	 */
 	public async postResult(result: TaskResult): Promise<TaskResult> {
 		debug(result);
-		const resp = await this.api.create<TaskResult>('/tasks', result);
-		debug(`HTTP POST /tasks res=${resp.statusCode}`);
-		if (resp.statusCode === 200) {
-			return resp.result;
-		}
-
-		throw new Error(`Failed to post result due to api statusCode=${resp.statusCode}`)
+		const resp = await this.postJson(`/tasks`, result);
+		debug(`HTTP POST /tasks res=${JSON.stringify(resp)}`);
+		return resp;
 	}
 
 	/**
@@ -97,13 +93,9 @@ export class WenduApiClient {
 		}
 
 		debug(taskDef);
-		const resp = await this.api.create<TaskDef>('/metadata/taskdefs', taskDef);
-		debug(`HTTP POST /metadata/taskdefs res=${resp.statusCode}`);
-		if (resp.statusCode === 200) {
-			return resp.result;
-		}
-
-		throw new Error(`Failed to regiser task definition due to api statusCode=${resp.statusCode}`)
+		const resp = await this.postJson('/metadata/taskdefs', taskDef);
+		debug(`HTTP POST /metadata/taskdefs resp=${JSON.stringify(resp)}`);
+		return resp;
 	}
 
 	public async startWorkflow(wf: WorkflowStart): Promise<any> {
@@ -113,12 +105,8 @@ export class WenduApiClient {
 		}
 
 		debug(wf);
-		const resp = await this.api.create<WorkflowStart>('/workflows', wf);
-		debug(`HTTP POST /metadata/taskdefs res=${resp.statusCode}`);
-		if (resp.statusCode === 200) {
-			return resp.result;
-		}
-
-		throw new Error(`Failed to start workflow instance due to api statusCode=${resp.statusCode}`)
+		const resp = await this.postJson('/workflows', wf);
+		debug(`HTTP POST /metadata/taskdefs res=${JSON.stringify(resp)}`);
+		return resp;
 	}
 }

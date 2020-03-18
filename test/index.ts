@@ -4,19 +4,12 @@ import {
 } from 'wendu-worker';
 
 const opts: WenduWorkerOptions = {
-	//url: `http://localhost:1331`,
-	url: `http://dt-wendu.itdev.ad.npr.org/`,
+	url: `http://localhost:1331`,
+	//url: `http://dt-wendu.itdev.ad.npr.org/`,
 	pollInterval:500,
 	total: 10,
 	workerIdentity: 'local-dev-roller',
-
-	onPreTaskExecution: async (t: Task) => {
-		t.logger = new WorkerLog({ logToConsole: true });
-	},
-
-	onPostTaskExecution: async (t: Task, result: WenduWorkerResult) => {
-		result.logs.push(...(t.logger?.getAll() ?? []));
-	}
+	logToConsole: true,
 };
 
 class DiceWorker extends WenduPollingWorker {
@@ -28,7 +21,7 @@ class DiceWorker extends WenduPollingWorker {
 
 	taskDef(): TaskDef {
 		return {
-			name: 'dice-roll',
+			name: 'say-hello',
 			description: 'rolling a dice',
 			retryCount: 0,
 			timeoutSeconds: 1,
