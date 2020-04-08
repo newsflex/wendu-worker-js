@@ -17,7 +17,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "bent": "^7.1.0",
+    "bent": "^7.1.2",
     "debug": "^4.1.1"
   }
 }

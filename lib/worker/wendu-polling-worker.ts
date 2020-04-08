@@ -4,6 +4,7 @@ import { Task, TaskResult, TaskDef, WorkerLog } from '../models';
 import { WenduWorkerResult } from './wendu-worker-result';
 
 const debug = require('debug')('wendu');
+const os = require('os');
 /**
  * Implement this class to create a long running
  * polling worker to run tasks.
@@ -24,7 +25,12 @@ export abstract class WenduPollingWorker {
 
 	constructor(private config: WenduWorkerOptions) {
 		config.taskName = this.taskDef().name;
+		config.workerIdentity = config.workerIdentity ?? this.getIdentity();
 		this.api = new WenduApiClient(config);
+	}
+
+	private getIdentity(): string {
+	return`wendu-worker-${os.hostname()}`;
 	}
 
 	public async start() {

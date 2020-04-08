@@ -1,7 +1,7 @@
 const bent = require('bent');
 const debug = require('debug')('wendu');
 
-import { Task, TaskResult, TaskDef, WorkflowStart } from '../models';
+import { Task, TaskResult, TaskDef, WorkflowStart, WorkflowDef } from '../models';
 import { WenduApiOptions } from './wendu-api-options';
 import { WenduWorkerOptions } from '../worker';
 
@@ -11,6 +11,12 @@ export class WenduApiClient {
 	private postJson: any;
 
 	constructor(private opts: WenduApiOptions) {
+	
+		// always remove the trailing slash if the user provided it
+		if (this.opts.url.endsWith('/')){
+			const len = this.opts.url.length;
+			this.opts.url = this.opts.url.substring(0, len-1);
+		}
 
 		// see https://github.com/mikeal/bent
 		this.getJson = bent('GET', this.opts.url, 'json');
@@ -107,6 +113,18 @@ export class WenduApiClient {
 		debug(wf);
 		const resp = await this.postJson('/workflows', wf);
 		debug(`HTTP POST /metadata/taskdefs res=${JSON.stringify(resp)}`);
+		return resp;
+	}
+
+	public async createWorkflowDef(wf: WorkflowDef): Promise<any> {
+
+		if (!wf.name) {
+			throw new Error('A Workflow name must be provided');
+		}
+
+		debug(wf);
+		const resp = await this.postJson('/metadata/workflow', wf);
+		debug(`HTTP POST /metadata/workflow res=${JSON.stringify(resp)}`);
 		return resp;
 	}
 }
