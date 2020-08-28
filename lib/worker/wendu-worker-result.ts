@@ -1,4 +1,4 @@
-import { TaskResultLog } from '../models';
+import { TaskResultLog } from "../models";
 
 /**
  * A smaller subset of task result data required for
@@ -11,18 +11,16 @@ import { TaskResultLog } from '../models';
  * @interface WenduWorkerResult
  */
 export interface WenduWorkerResult {
+  status: "IN_PROGRESS" | "FAILED" | "COMPLETED";
 
-	status: 'IN_PROGRESS' | 'FAILED' | 'COMPLETED';
+  /**
+   * key/value data. Only put data in here that subsequeue tasks/workflow require.
+   * Keep it small!
+   *
+   * @type {{ [key: string]: any }}
+   * @memberof WenduWorkerResult
+   */
+  outputData?: { [key: string]: any };
 
-
-	/**
-	 * key/value data. Only put data in here that subsequeue tasks/workflow require.
-	 * Keep it small!
-	 *
-	 * @type {{ [key: string]: any }}
-	 * @memberof WenduWorkerResult
-	 */
-	outputData?: { [key: string]: any };
-
-	logs?: TaskResultLog[];
+  logs?: TaskResultLog[];
 }
