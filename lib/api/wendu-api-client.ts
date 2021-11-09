@@ -3,13 +3,14 @@ const debug = require("debug")("wendu");
 
 import {
   Task,
-  TaskResult,
   TaskDef,
-  WorkflowStart,
+  TaskResult,
+  WenduEvent,
   WorkflowDef,
+  WorkflowStart,
 } from "../models";
-import { WenduApiOptions } from "./wendu-api-options";
 import { WenduWorkerOptions } from "../worker";
+import { WenduApiOptions } from "./wendu-api-options";
 
 export class WenduApiClient {
   private getJson: any;
@@ -123,6 +124,19 @@ export class WenduApiClient {
     debug(wf);
     const resp = await this.postJson("/metadata/workflow", wf);
     debug(`HTTP POST /metadata/workflow res=${JSON.stringify(resp)}`);
+    return resp;
+  }
+
+  /** Relays events into Message Queue in Wendu.
+   * This will queue any wfs that may be listening for these events **/
+  public async queueEvent(event: WenduEvent): Promise<any> {
+    if (!event.name) {
+      throw new Error("A Wendu Event name must be provided");
+    }
+
+    debug(event);
+    const resp = await this.postJson("/events", event);
+    debug(`HTTP POST /events res=${JSON.stringify(resp)}`);
     return resp;
   }
 }

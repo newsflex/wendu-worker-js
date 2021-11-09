@@ -1,12 +1,11 @@
 import {
-  WenduWorkerOptions,
-  WenduPollingWorker,
-  WenduWorkerResult,
   Task,
   TaskDef,
   WenduApiClient,
   WenduApiOptions,
-  WorkerLog,
+  WenduPollingWorker,
+  WenduWorkerOptions,
+  WenduWorkerResult,
 } from "wendu-worker";
 
 const opts: WenduWorkerOptions = {
@@ -72,3 +71,5 @@ const opt: WenduApiOptions = {
 };
 
 const client = new WenduApiClient(opt);
+
+client.queueEvent({ name: "say-hello-joe", input: { sides: 8 } });

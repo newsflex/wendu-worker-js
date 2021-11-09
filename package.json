@@ -1,6 +1,6 @@
 {
   "name": "wendu-worker-js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A Typescript/Javascript client library to implement Wendu Workers",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "bent": "^7.1.2",
-    "debug": "^4.1.1"
+    "bent": "^7.3.12",
+    "debug": "^4.3.2"
   }
 }
