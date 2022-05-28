@@ -1,4 +1,4 @@
-import { WorkerLog } from './logger';
+import { WorkerLog } from "./logger";
 
 /**
  * The unit of work to be completed by the worker.
@@ -11,15 +11,14 @@ import { WorkerLog } from './logger';
  * @interface Task
  */
 export interface Task {
+  name: string;
+  taskId: string;
+  status: string;
+  inputData: any;
+  output?: any;
 
-	name: string;
-	taskId: string;
-	status: string;
-	inputData: any;
-	output?: any;
+  correlationId: string;
+  workflowInstanceId?: string;
 
-	correlationId: string;
-	workflowId?: string;
-
-	logger?: WorkerLog;
+  logger?: WorkerLog;
 }
