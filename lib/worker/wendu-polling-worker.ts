@@ -1,6 +1,6 @@
 import { WenduApiClient } from "../api";
+import { Task, TaskDef, TaskResult, WorkerLog } from "../models";
 import { WenduWorkerOptions } from "./wendu-worker-options";
-import { Task, TaskResult, TaskDef, WorkerLog } from "../models";
 import { WenduWorkerResult } from "./wendu-worker-result";
 
 const debug = require("debug")("wendu");
