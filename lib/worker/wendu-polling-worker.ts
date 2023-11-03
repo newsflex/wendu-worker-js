@@ -172,6 +172,13 @@ export abstract class WenduPollingWorker {
    * @memberof PollingWorker
    */
   public async sendTaskResult(t: Task, result: WenduWorkerResult) {
+    // always log which server is running this work for dev sanity
+    result.logs = result.logs ?? [];
+    result.logs.push({
+      log: `Server: ${os.hostname()}`,
+      createdTime: new Date().getTime(),
+    });
+
     // once done you send result to api
     const taskResult: TaskResult = {
       workflowInstanceId: t.workflowId,
