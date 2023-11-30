@@ -67,7 +67,13 @@ export abstract class WenduPollingWorker {
     if (td.name !== this.config.taskName) {
       throw new Error("Task Def name must match polling task name");
     }
-    await this.api.register(this.taskDef());
+    let token;
+    try {
+      token = await this.api.getToken();
+    } catch (err) {
+      console.error("failed to get token", err);
+    }
+    await this.api.register(this.taskDef(), token);
   }
 
   private async pollForWork() {
@@ -78,7 +84,8 @@ export abstract class WenduPollingWorker {
     }
 
     try {
-      const tasks = await this.api.poll(this.config);
+      const data = await this.api.poll(this.config);
+      const tasks = Array.isArray(data) ? data : [data];
       await Promise.all(tasks.map(async (t) => await this.processTask(t)));
     } catch (err) {
       debug(err);
@@ -181,7 +188,7 @@ export abstract class WenduPollingWorker {
 
     // once done you send result to api
     const taskResult: TaskResult = {
-      workflowInstanceId: t.workflowId,
+      workflowInstanceId: t.workflowInstanceId,
       taskId: t.taskId,
       workerId: this.id,
 
@@ -196,9 +203,10 @@ export abstract class WenduPollingWorker {
   }
 
   private async ackTask(t: Task) {
+    // ack no longer needed?
     // tell the api you have recieved the task (acknowledge it)
-    const acked = await this.api.ack(t);
-    debug(`Worker=${this.id} acked = ${acked === true} taskId=${t.taskId}`);
+    //const acked = await this.api.ack(t);
+    //debug(`Worker=${this.id} acked = ${acked === true} taskId=${t.taskId}`);
   }
 
   public async stop() {

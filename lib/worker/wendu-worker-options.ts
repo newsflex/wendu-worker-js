@@ -37,4 +37,6 @@ export interface WenduWorkerOptions extends WenduApiOptions {
   total: number;
 
   logToConsole?: boolean;
+
+  taskDomain?: string;
 }

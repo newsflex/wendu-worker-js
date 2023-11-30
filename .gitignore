@@ -66,3 +66,5 @@ node_modules
 typings
 npm-debug.log
 node_modules
+
+secret*

@@ -1,20 +1,27 @@
 import {
   Task,
   TaskDef,
-  WenduApiClient,
-  WenduApiOptions,
   WenduPollingWorker,
   WenduWorkerOptions,
   WenduWorkerResult,
 } from "wendu-worker";
 
+if (!process.env.USER_ID || !process.env.USER_SECRET) {
+  throw new Error("Missing process.env.USER_KEY and process.env.USER_SECRET");
+}
+
 const opts: WenduWorkerOptions = {
-  url: `http://localhost:1331`,
+  //url: `http://localhost:1331`,
+  //url: "https://npr-app.orkesconductor.io/",
   //url: `http://dt-wendu.itdev.ad.npr.org/`,
-  pollInterval: 500,
+  url: "https://nexus-stage-wtz.orkesconductor.net/api",
+  keyId: process.env.USER_ID,
+  secret: process.env.USER_SECRET,
+  pollInterval: 2_000,
   total: 10,
   workerIdentity: "local-dev-roller",
   logToConsole: true,
+  //taskDomain: "dev",
 };
 
 class DiceWorker extends WenduPollingWorker {
@@ -22,12 +29,13 @@ class DiceWorker extends WenduPollingWorker {
     super(opts);
   }
 
-  taskDef(): TaskDef {
+  taskDef(): TaskDef | any {
     return {
-      name: "say-hello",
+      name: "dice_roll2",
       description: "rolling a dice",
       retryCount: 0,
-      timeoutSeconds: 1,
+      responseTimeoutSeconds: 15,
+      timeoutSeconds: 30,
       inputKeys: ["sides"],
       outputKeys: ["roll"],
       inputTemplate: null,
@@ -61,15 +69,3 @@ class DiceWorker extends WenduPollingWorker {
 const worker = new DiceWorker(opts);
 
 worker.start();
-
-// worker.stop();
-
-/* Example 2 - Creating a direct API client */
-
-const opt: WenduApiOptions = {
-  url: `http://localhost:1331`,
-};
-
-const client = new WenduApiClient(opt);
-
-client.queueEvent({ name: "say-hello-joe", input: { sides: 8 } });

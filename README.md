@@ -4,6 +4,8 @@ A lightweight Wendu Worker Typescript/Javascript lib for polling the Wendu Orche
 
 Install using `npm install --save wendu-worker-js`
 
+Version 0.4.0 allows providing user Id and Secret for conductor tokens for API. 
+
 ## General Worker Steps
 
 A worker is a micro-server that performs a task for the Wendu Orchestration engine. A woker should be implemented in the following pattern
