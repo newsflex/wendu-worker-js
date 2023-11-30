@@ -6,7 +6,4 @@ export class WenduApiOptions {
    * @memberof WenduApiOptions
    */
   url: string;
-
-  keyId?: string;
-  secret: string;
 }
