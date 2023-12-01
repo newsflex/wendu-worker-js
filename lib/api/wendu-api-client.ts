@@ -92,10 +92,10 @@ export class WenduApiClient {
         "User-Agent": "wendu-worker",
       },
     });
-    debug(`HTTP POST /metadata/taskdefs resp=${response.status}`);
+    debug(`HTTP POST ${url} resp=${response.status}`);
     if (response.status === 200) {
       const data = await response.json();
-      console.log("data", data);
+      debug("data", data);
       return data as Task[];
     }
 
@@ -148,7 +148,7 @@ export class WenduApiClient {
       body: JSON.stringify(result),
     });
 
-    debug(`HTTP POST /tasks res=${resp.status}`);
+    debug(`HTTP POST ${url} res=${resp.status}`);
     return result;
   }
 
@@ -183,12 +183,13 @@ export class WenduApiClient {
           "Content-Type": "application/json",
         },
       });
-      debug(`HTTP POST /metadata/taskdefs resp=${response.status}`);
+      debug(`HTTP POST ${url} resp=${response.status}`);
       if (response.status === 200) {
         return taskDef;
       }
     } catch (err) {
-      console.log(err);
+      debug("ERROR:" + err);
+      throw err;
     }
   }
 
@@ -199,7 +200,7 @@ export class WenduApiClient {
 
     debug(wf);
     const resp = await this.postJson("/workflows", wf);
-    debug(`HTTP POST /metadata/taskdefs res=${JSON.stringify(resp)}`);
+    debug(`HTTP POST /workflows res=${JSON.stringify(resp)}`);
     return resp;
   }
 

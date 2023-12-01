@@ -6,31 +6,31 @@
  * @interface TaskDef
  */
 export interface TaskDef {
+  // unique identifier
+  name: string;
 
-	// unique identifier
-	name: string;
+  description?: string;
 
-	description?: string;
+  retryCount?: number;
+  timeoutSeconds?: number;
+  responseTimeoutSeconds?: number;
 
-	retryCount?: number;
-	timeoutSeconds?: number;
+  inputKeys?: string[];
+  outputKeys?: string[];
 
-	inputKeys?: string[];
-	outputKeys?: string[];
+  // key=value object
+  inputTemplate?: any;
 
-	// key=value object
-	inputTemplate?: any;
-
-	/*
+  /*
 	 RETRY : Retries the task again
 	 TIME_OUT_WF : Workflow is marked as TIMED_OUT and terminated
 	 ALERT_ONLY : Registers a counter (task_timeout)
 	*/
-	timeoutPolicy?: 'RETRY' | 'TIME_OUT_WF' | 'ALERT_ONLY';
+  timeoutPolicy?: "RETRY" | "TIME_OUT_WF" | "ALERT_ONLY";
 
-	//  FIXED : Reschedule the task after the retryDelaySeconds
-	// EXPONENTIAL_BACKOFF : reschedule after retryDelaySeconds  * attemptNumber
-	retryLogic?: 'FIXED' | 'EXPONENTIAL_BACKOFF';
+  //  FIXED : Reschedule the task after the retryDelaySeconds
+  // EXPONENTIAL_BACKOFF : reschedule after retryDelaySeconds  * attemptNumber
+  retryLogic?: "FIXED" | "EXPONENTIAL_BACKOFF";
 
-	retryDelaySeconds?: number;
+  retryDelaySeconds?: number;
 }
