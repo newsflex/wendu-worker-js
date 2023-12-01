@@ -75,11 +75,13 @@ export class WenduApiClient {
     };
 
     // worker querystring for wendu and workerId/domain for conductor
-    const route = `/tasks/poll/${qs.name}?worker=${qs.id}&workerid=${
-      qs.id
-    }&total=${qs.total}&interval=${qs.interval}&domain=${
-      config.taskDomain ?? ""
-    }`;
+    let route = `/tasks/poll/${qs.name}?worker=${qs.id}&workerid=${qs.id}&total=${qs.total}&interval=${qs.interval}`;
+
+    // blank domains cause issues so only add if there is a proper app domain
+    if (config.taskDomain?.length > 0) {
+      route = route + `&domain=${config.taskDomain ?? ""}`;
+    }
+
     let token = await this.getToken();
     let url = this.opts.url + route;
 

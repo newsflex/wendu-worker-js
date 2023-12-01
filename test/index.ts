@@ -17,7 +17,7 @@ const opts: WenduWorkerOptions = {
   url: "https://nexus-stage-wtz.orkesconductor.net/api",
   keyId: process.env.USER_ID,
   secret: process.env.USER_SECRET,
-  pollInterval: 2_000,
+  pollInterval: 10_000,
   total: 10,
   workerIdentity: "local-dev-roller",
   logToConsole: true,
