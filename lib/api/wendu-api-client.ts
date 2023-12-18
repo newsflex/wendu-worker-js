@@ -40,6 +40,13 @@ export class WenduApiClient {
   }
 
   public async getToken() {
+    if (!this.opts?.keyId && !this.opts?.secret) {
+      // wendu mode has no need for tokens but orkes does
+      // orkes mode will provide these values
+      debug("getToken disabled due to missing keyId and secret (legacy mode)");
+      return null;
+    }
+
     debug("get json web token");
 
     if (this.token) {
