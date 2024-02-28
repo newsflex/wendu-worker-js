@@ -18,6 +18,10 @@ export class WenduApiClient {
   // token cache
   private token: string = null;
 
+  public isOrkesMode() {
+    return this.opts?.keyId && this.opts?.secret;
+  }
+
   constructor(private opts: WenduApiOptions) {
     // always remove the trailing slash if the user provided it
     if (this.opts.url.endsWith("/")) {
@@ -40,7 +44,7 @@ export class WenduApiClient {
   }
 
   public async getToken() {
-    if (!this.opts?.keyId && !this.opts?.secret) {
+    if (!this.isOrkesMode()) {
       // wendu mode has no need for tokens but orkes does
       // orkes mode will provide these values
       debug("getToken disabled due to missing keyId and secret (legacy mode)");

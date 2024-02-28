@@ -115,7 +115,11 @@ export abstract class WenduPollingWorker {
       return;
     }
 
-    await this.sendTaskResult(t, { status: "IN_PROGRESS" });
+    // do not send this in orkes mode. it will cause the task to requeue
+    if (!this.api.isOrkesMode()) {
+      await this.sendTaskResult(t, { status: "IN_PROGRESS" });
+    }
+
     try {
       t.logger = new WorkerLog({ logToConsole: this.config.logToConsole });
       const result = await this.execute(t);
