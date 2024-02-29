@@ -166,7 +166,8 @@ export class WenduApiClient {
     if (resp.status !== 200) {
       let respErrorBody;
       try {
-        respErrorBody = await resp.json();
+        const respJson = await resp.json();
+        respErrorBody = JSON.stringify(respJson || {});
       } catch (err2) {
         debug(err2);
       }
