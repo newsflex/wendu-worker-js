@@ -162,6 +162,20 @@ export class WenduApiClient {
     });
 
     debug(`HTTP POST ${url} res=${resp.status}`);
+
+    if (resp.status !== 200) {
+      let respErrorBody;
+      try {
+        respErrorBody = await resp.json();
+      } catch (err2) {
+        debug(err2);
+      }
+
+      throw new Error(
+        `Failed to report task result to Orch API ${resp?.status} ${resp?.statusText} ${respErrorBody}`
+      );
+    }
+
     return result;
   }
 

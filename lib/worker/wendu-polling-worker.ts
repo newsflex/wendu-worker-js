@@ -105,16 +105,6 @@ export abstract class WenduPollingWorker {
   }
 
   private async processTask(t: Task) {
-    try {
-      await this.ackTask(t);
-    } catch (err) {
-      debug(
-        `Failed to ACK task because it is now invalid or someone else acked it. Skipping task`
-      );
-      debug(err);
-      return;
-    }
-
     // do not send this in orkes mode. it will cause the task to requeue
     if (!this.api.isOrkesMode()) {
       await this.sendTaskResult(t, { status: "IN_PROGRESS" });
@@ -203,14 +193,11 @@ export abstract class WenduPollingWorker {
     };
 
     await this.api.postResult(taskResult);
-    debug(`Worker=${this.id} Task Result Sent for taskId=${taskResult.taskId}`);
-  }
-
-  private async ackTask(t: Task) {
-    // ack no longer needed?
-    // tell the api you have recieved the task (acknowledge it)
-    //const acked = await this.api.ack(t);
-    //debug(`Worker=${this.id} acked = ${acked === true} taskId=${t.taskId}`);
+    debug(
+      `Worker=${this.id} Task Result Sent for taskId=${
+        taskResult.taskId
+      } ${JSON.stringify(taskResult)}`
+    );
   }
 
   public async stop() {
