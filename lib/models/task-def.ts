@@ -15,6 +15,9 @@ export interface TaskDef {
   timeoutSeconds?: number;
   responseTimeoutSeconds?: number;
 
+  /** When configured with a value > 0, the system will wait for this task to complete successfully until this number of seconds from when the task is first polled. We can use this to fail a workflow when a task breaches the overall SLA for completion. */
+  pollTimeoutSeconds?: number;
+
   inputKeys?: string[];
   outputKeys?: string[];
 
@@ -28,9 +31,16 @@ export interface TaskDef {
 	*/
   timeoutPolicy?: "RETRY" | "TIME_OUT_WF" | "ALERT_ONLY";
 
-  //  FIXED : Reschedule the task after the retryDelaySeconds
+  // FIXED : Reschedule the task after the retryDelaySeconds
   // EXPONENTIAL_BACKOFF : reschedule after retryDelaySeconds  * attemptNumber
-  retryLogic?: "FIXED" | "EXPONENTIAL_BACKOFF";
+  // LINEAR_BACKOFF: Reschedule after retryDelaySeconds backoffRate attemptNumber
+  retryLogic?: "FIXED" | "EXPONENTIAL_BACKOFF" | "LINEAR_BACKOFF";
+
+  /** LINEAR_BACKOFF: Reschedule after retryDelaySeconds backoffRate attemptNumber */
+  backoffRate?: number;
 
   retryDelaySeconds?: number;
+
+  /** you can add the workflow name to be run on the failure of your current workflow: */
+  failureWorkflow?: string;
 }

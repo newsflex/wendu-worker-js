@@ -40,6 +40,14 @@ export abstract class WenduPollingWorker {
       throw new Error(`You must provide a valid polling interval in config`);
     }
 
+    // safety check to make sure no one is polling too fast. You shouldn't need to poll more than
+    // every 100 ms
+    if (this.config.pollInterval < 100) {
+      throw new Error(
+        `You cannot poll faster than every 100 ms. Increase the pollInterval ms config to a value > 100`
+      );
+    }
+
     await this.registerTaskDef();
 
     debug(
