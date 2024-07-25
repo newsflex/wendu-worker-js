@@ -227,8 +227,31 @@ export class WenduApiClient {
     }
 
     debug(wf);
-    const resp = await this.postJson("/workflows", wf);
-    debug(`HTTP POST /workflows res=${JSON.stringify(resp)}`);
+
+    if (!this.isOrkesMode()) {
+      // legacy wendu
+      const resp = await this.postJson("/workflows", wf);
+      debug(`HTTP POST /workflows res=${JSON.stringify(resp)}`);
+      return resp;
+    }
+
+    const token = await this.getToken();
+    const url = this.opts.url + "/workflow";
+    debug(`HTTP POST ${url}`);
+    const resp = await fetch(url, {
+      method: "post",
+      body: JSON.stringify(wf),
+      headers: {
+        "X-Authorization": token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    debug(
+      `HTTP POST ${url} ${resp.status} ${resp.statusText} res=${JSON.stringify(
+        resp
+      )}`
+    );
     return resp;
   }
 
