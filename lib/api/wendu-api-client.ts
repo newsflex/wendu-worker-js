@@ -237,7 +237,7 @@ export class WenduApiClient {
 
     const token = await this.getToken();
     const url = this.opts.url + "/workflow";
-    debug(`HTTP POST ${url}`);
+    debug(`HTTP POST ${this.isOrkesMode() ? "orkes" : "wendu"} ${url}`);
     const resp = await fetch(url, {
       method: "post",
       body: JSON.stringify(wf),
@@ -247,12 +247,11 @@ export class WenduApiClient {
       },
     });
 
+    const workflowId = await resp.text();
     debug(
-      `HTTP POST ${url} ${resp.status} ${resp.statusText} res=${JSON.stringify(
-        resp
-      )}`
+      `HTTP POST ${url} ${resp.status} ${resp.statusText} res=${workflowId}`
     );
-    return resp;
+    return { workflowId: workflowId };
   }
 
   public async createWorkflowDef(wf: WorkflowDef): Promise<any> {
