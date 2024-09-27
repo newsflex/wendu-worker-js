@@ -10,19 +10,34 @@ if (!process.env.USER_ID || !process.env.USER_SECRET) {
   throw new Error("Missing process.env.USER_KEY and process.env.USER_SECRET");
 }
 
+//const url = "http://dt-wendu.itdev.ad.npr.org/";
+const url = "https://st-orkes.npr.org/api";
+const isOrkes = url.includes("orkes");
+console.log("isOrkes", isOrkes);
 const opts: WenduWorkerOptions = {
   //url: `http://localhost:1331`,
-  //url: "https://npr-app.orkesconductor.io/",
-  //url: `http://dt-wendu.itdev.ad.npr.org/`,
-  url: "https://nexus-stage-wtz.orkesconductor.net/api",
-  keyId: process.env.USER_ID,
-  secret: process.env.USER_SECRET,
+  url: url,
+  keyId: isOrkes ? process.env.USER_ID : null,
+  secret: isOrkes ? process.env.USER_SECRET : null,
   pollInterval: 10_000,
-  total: 10,
+  total: 1,
   workerIdentity: "local-dev-roller",
   logToConsole: true,
   //taskDomain: "dev",
 };
+
+console.log(opts);
+
+/*
+const client = new WenduApiClient(opts);
+client
+  .startWorkflow({
+    name: "joeTest_json_var_test",
+    //name: "asdf",
+  })
+  .then(console.log)
+  .catch(console.error);
+  */
 
 class DiceWorker extends WenduPollingWorker {
   constructor(opts: WenduWorkerOptions) {
@@ -67,5 +82,4 @@ class DiceWorker extends WenduPollingWorker {
 }
 
 const worker = new DiceWorker(opts);
-
 worker.start();

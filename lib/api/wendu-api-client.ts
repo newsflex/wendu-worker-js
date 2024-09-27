@@ -88,6 +88,12 @@ export class WenduApiClient {
     // worker querystring for wendu and workerId/domain for conductor
     let route = `/tasks/poll/${qs.name}?worker=${qs.id}&workerid=${qs.id}&total=${qs.total}&interval=${qs.interval}`;
 
+    if (this.isOrkesMode() && qs.total > 1) {
+      // orkes have seperate batch route
+      // https://st-orkes.npr.org/swagger-ui/index.html#/
+      route = `/tasks/poll/batch/${qs.name}?worker=${qs.id}&workerid=${qs.id}&count=${qs.total}&interval=${qs.interval}`;
+    }
+
     // blank domains cause issues so only add if there is a proper app domain
     if (config.taskDomain?.length > 0) {
       route = route + `&domain=${config.taskDomain ?? ""}`;
