@@ -193,7 +193,7 @@ export abstract class WenduPollingWorker {
       workflowInstanceId: t.workflowInstanceId,
       taskId: t.taskId,
       workerId: this.id,
-
+      reasonForIncompletion: result.reasonForIncompletion,
       // worker will provide this dynamic data
       status: result.status,
       outputData: result.outputData,

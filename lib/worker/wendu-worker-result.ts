@@ -23,4 +23,6 @@ export interface WenduWorkerResult {
   outputData?: { [key: string]: any };
 
   logs?: TaskResultLog[];
+
+  reasonForIncompletion?: string;
 }
