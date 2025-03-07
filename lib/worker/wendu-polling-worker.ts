@@ -18,6 +18,9 @@ export abstract class WenduPollingWorker {
   private pollingInterval: NodeJS.Timeout;
   protected api: WenduApiClient;
 
+  // how many tasks is this worker doing right now?
+  private activeQueue = 0;
+
   get id(): string {
     return this.config.workerIdentity;
   }
@@ -91,8 +94,14 @@ export abstract class WenduPollingWorker {
       );
     }
 
+    if (this.activeQueue >= this.config.total){
+      // this worker is busy and cannot take on any more work
+      debug(`Woker is busy. (activeQueue) ${this.activeQueue} vs ${this.config.total} (total)`)
+      return;
+    }
+
     try {
-      const data = await this.api.poll(this.config);
+      const data = await this.api.poll(this.config, this.activeQueue);
       const tasks = Array.isArray(data) ? data : [data];
       await Promise.all(tasks.map(async (t) => await this.processTask(t)));
     } catch (err) {
@@ -113,6 +122,9 @@ export abstract class WenduPollingWorker {
   }
 
   private async processTask(t: Task) {
+    
+    this.activeQueue++;
+
     // do not send this in orkes mode. it will cause the task to requeue
     if (!this.api.isOrkesMode()) {
       await this.sendTaskResult(t, { status: "IN_PROGRESS" });
@@ -143,6 +155,8 @@ export abstract class WenduPollingWorker {
         ],
       });
     }
+
+    this.activeQueue--;
   }
 
   /**

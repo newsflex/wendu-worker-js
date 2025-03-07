@@ -19,8 +19,8 @@ const opts: WenduWorkerOptions = {
   url: url,
   keyId: isOrkes ? process.env.USER_ID : null,
   secret: isOrkes ? process.env.USER_SECRET : null,
-  pollInterval: 10_000,
-  total: 1,
+  pollInterval: 5_000,
+  total: 3,
   workerIdentity: "local-dev-roller",
   logToConsole: true,
   //taskDomain: "dev",
@@ -46,7 +46,7 @@ class DiceWorker extends WenduPollingWorker {
 
   taskDef(): TaskDef | any {
     return {
-      name: "dice_roll2",
+      name: "_test_sleep",
       description: "rolling a dice",
       retryCount: 0,
       responseTimeoutSeconds: 15,
@@ -66,6 +66,8 @@ class DiceWorker extends WenduPollingWorker {
     const sides = task.inputData["sides"] || 6;
     const roll = Math.floor(sides * Math.random()) + 1;
 
+    
+
     const res: WenduWorkerResult = {
       status: "COMPLETED",
       outputData: { roll: roll },
@@ -77,8 +79,13 @@ class DiceWorker extends WenduPollingWorker {
       ],
     };
 
+    await this.sleep(15_000);
     return res;
   }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 }
 
 const worker = new DiceWorker(opts);

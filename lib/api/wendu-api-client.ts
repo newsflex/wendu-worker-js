@@ -77,12 +77,17 @@ export class WenduApiClient {
    * @returns {(Promise<Task[] | null>)}
    * @memberof WenduApiClient
    */
-  public async poll(config: WenduWorkerOptions): Promise<Task[] | null> {
+  public async poll(config: WenduWorkerOptions, activeQueue: number = 0): Promise<Task[] | null> {
+
+    // if worker can queue 5 total but is working on 2 currently. then only poll for 3
+    // 3 = 5 - 2;
+    const totalToPoll = config.total - activeQueue;
+
     const qs = {
       name: encodeURIComponent(config.taskName),
       id: encodeURIComponent(config.workerIdentity),
       interval: config.pollInterval,
-      total: config.total,
+      total: totalToPoll,
     };
 
     // worker querystring for wendu and workerId/domain for conductor
@@ -111,7 +116,7 @@ export class WenduApiClient {
         "User-Agent": "wendu-worker",
       },
     });
-    debug(`HTTP POST ${url} resp=${response.status}`);
+    debug(`HTTP GET ${url} resp=${response.status}`);
     if (response.status === 200) {
       const data = await response.json();
       debug("data", data);
