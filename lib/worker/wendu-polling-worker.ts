@@ -139,12 +139,20 @@ export abstract class WenduPollingWorker {
       result.logs.push(...items);
 
       await this.sendTaskResult(t, result);
+
+      // update counter before we send task result in case that fails too
+      this.activeQueue--;
+
     } catch (err) {
+
+      // update counter before we send task result in case that fails too
+      this.activeQueue--;
+      
       debug(
         `ERROR: Failed to perform taskId=${t.taskId} work due to un-caught err in worker implementation. Reporting task as failed`
       );
       debug(err);
-
+      
       await this.sendTaskResult(t, {
         status: "FAILED",
         logs: [
@@ -155,8 +163,6 @@ export abstract class WenduPollingWorker {
         ],
       });
     }
-
-    this.activeQueue--;
   }
 
   /**

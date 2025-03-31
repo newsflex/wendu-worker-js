@@ -12,4 +12,5 @@ export interface WorkflowStart {
 	input?: any;
 
 	correlationId?: string;
+	taskToDomain?: any;
 }
