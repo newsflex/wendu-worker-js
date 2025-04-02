@@ -15,8 +15,10 @@ const os = require("os");
  * @class PollingWorker
  */
 export abstract class WenduPollingWorker {
+  private MAX_TIME_WITHOUT_POLLING = 5 * 60 * 1000; // 5 minutes
   private pollingInterval: NodeJS.Timeout;
   protected api: WenduApiClient;
+  private lastTaskTime = Date.now();
 
   // how many tasks is this worker doing right now?
   private activeQueue = 0;
@@ -29,6 +31,9 @@ export abstract class WenduPollingWorker {
     config.taskName = this.taskDef().name;
     config.workerIdentity = config.workerIdentity ?? this.getIdentity();
     this.api = new WenduApiClient(config);
+
+    // Periodically reset activeQueue if stuck
+    setInterval(() => this.resetStuckQueue(), 60 * 1000); // Run every minute
   }
 
   private getIdentity(): string {
@@ -58,7 +63,11 @@ export abstract class WenduPollingWorker {
     );
 
     this.pollingInterval = setInterval(async () => {
-      await this.pollForWork();
+      try {
+        await this.pollForWork();
+      } catch (err) {
+        console.error("failed to poll for work", err);
+      }
     }, this.config.pollInterval);
 
     debug(`Worker=${this.id} has started`);
@@ -94,11 +103,15 @@ export abstract class WenduPollingWorker {
       );
     }
 
-    if (this.activeQueue >= this.config.total){
+    if (this.activeQueue >= this.config.total) {
       // this worker is busy and cannot take on any more work
-      debug(`Woker is busy. (activeQueue) ${this.activeQueue} vs ${this.config.total} (total)`)
+      debug(
+        `Woker is busy. (activeQueue) ${this.activeQueue} vs ${this.config.total} (total)`
+      );
       return;
     }
+
+    this.lastTaskTime = Date.now();
 
     try {
       const data = await this.api.poll(this.config, this.activeQueue);
@@ -122,12 +135,11 @@ export abstract class WenduPollingWorker {
   }
 
   private async processTask(t: Task) {
-    
     this.activeQueue++;
 
     // do not send this in orkes mode. it will cause the task to requeue
     if (!this.api.isOrkesMode()) {
-      await this.sendTaskResult(t, { status: "IN_PROGRESS" });
+      await this.trySendTaskResult(t, { status: "IN_PROGRESS" });
     }
 
     try {
@@ -136,24 +148,18 @@ export abstract class WenduPollingWorker {
 
       result.logs = result.logs ?? [];
       const items = t.logger?.getAll() ?? [];
-      result.logs.push(...items);
+      if (items) {
+        result.logs.push(...items);
+      }
 
-      await this.sendTaskResult(t, result);
-
-      // update counter before we send task result in case that fails too
-      this.activeQueue--;
-
+      await this.trySendTaskResult(t, result);
     } catch (err) {
-
-      // update counter before we send task result in case that fails too
-      this.activeQueue--;
-      
       debug(
         `ERROR: Failed to perform taskId=${t.taskId} work due to un-caught err in worker implementation. Reporting task as failed`
       );
       debug(err);
-      
-      await this.sendTaskResult(t, {
+
+      await this.trySendTaskResult(t, {
         status: "FAILED",
         logs: [
           {
@@ -162,6 +168,36 @@ export abstract class WenduPollingWorker {
           },
         ],
       });
+    } finally {
+      this.activeQueue--;
+    }
+  }
+
+  private async trySendTaskResult(t: Task, result: WenduWorkerResult) {
+    try {
+      await this.sendTaskResult(t, result);
+    } catch (err) {
+      console.error(
+        `Failed to send ${result?.status} status for taskId=${t?.taskId}`,
+        err,
+        result
+      );
+      debug(
+        `Failed to send ${result?.status} status for taskId=${t?.taskId}`,
+        err
+      );
+    }
+  }
+
+  private resetStuckQueue() {
+    if (Date.now() - this.lastTaskTime > this.MAX_TIME_WITHOUT_POLLING) {
+      console.warn(
+        `Resetting activeQueue. No task completed in ${this.MAX_TIME_WITHOUT_POLLING} ms`
+      );
+      debug(
+        `Resetting activeQueue. No task completed in ${this.MAX_TIME_WITHOUT_POLLING} ms`
+      );
+      this.activeQueue = 0;
     }
   }
 
