@@ -19,6 +19,7 @@ export abstract class WenduPollingWorker {
   private pollingInterval: NodeJS.Timeout;
   protected api: WenduApiClient;
   private lastTaskTime = Date.now();
+  private interval;
 
   // how many tasks is this worker doing right now?
   private activeQueue = 0;
@@ -33,7 +34,7 @@ export abstract class WenduPollingWorker {
     this.api = new WenduApiClient(config);
 
     // Periodically reset activeQueue if stuck
-    setInterval(() => this.resetStuckQueue(), 60 * 1000); // Run every minute
+    this.interval = setInterval(() => this.resetStuckQueue(), 60 * 1000); // Run every minute
   }
 
   private getIdentity(): string {
@@ -265,6 +266,9 @@ export abstract class WenduPollingWorker {
   }
 
   public async stop() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
     // todo...really we should NACK all pending tasks
     this.stopPolling();
     debug(`Worker=${this.id} has stopped`);
