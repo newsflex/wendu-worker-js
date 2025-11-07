@@ -162,6 +162,8 @@ export abstract class WenduPollingWorker {
 
       await this.trySendTaskResult(t, {
         status: "FAILED",
+        // log the reason we failed for better reporting/monitoring and don't let the error get too big
+        reasonForIncompletion: err?.message.slice(0, 500) || err?.toString()?.slice(0, 500),
         logs: [
           {
             log: err.toString(),
